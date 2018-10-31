@@ -1,2 +1,4 @@
-app/data/*
 app/venv/*
+app/data/*/
+app/__pycache__/
+client/node_modules/*

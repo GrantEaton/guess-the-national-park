@@ -1,10 +1,16 @@
 import os.path
 import random
 import imageio
+import json
 
 from flask import Flask
 from flask import send_from_directory, request, make_response, jsonify
+from flask_cors import CORS
+
+from data.nationalParks import get_parks
+
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}}, expose_headers='imageHash')
 app._static_folder = "./data"
 
 def get_random_photo_dir():
@@ -20,22 +26,32 @@ def get_random_photo_dir():
     return np_dir, filename
 
 
-@app.route("/get-photo", methods=['GET'])
+@app.route("/api/get-photo", methods=['GET'])
 def get_photo():
     
     np_dir, filename = get_random_photo_dir() 
     response = send_from_directory(np_dir, filename)
-    response.headers['key'] = filename
+    response.headers['imageHash'] = filename
     return response
 
-@app.route("/guess-photo", methods=['POST'])
+@app.route("/api/get-national-parks", methods=['GET'])
+def get_national_parks():
+    response = make_response(jsonify({"national_parks": get_parks()}), 200)
+    response.mimetype = "application/javascript"
+    return response
+
+
+
+@app.route("/api/guess-photo", methods=['POST'])
 def guess_photo():
-    data = request.form
-    
-    if 'imageHash' in data and 'guess' in data:
+    data = request.json
+    msg = None 
+
+    if 'imageHash' in data and 'guesses' in data:
         image_hash = data['imageHash']
-        guess = data['guess']
-    
+        guesses = data['guesses']
+
+
         np_dirs = [x[0] for x in os.walk("./data/")]
         # loop through all NPs
         for np in np_dirs:
@@ -43,18 +59,18 @@ def guess_photo():
             # loop through all images in park
             for img in img_dirs[0]:
                 if image_hash in img:
-                    msg = {}
-
-                    # check if guess is the same as np directory
-                    if guess.lower() == np.lower().replace("_", " ").split("/")[-1]:
-                        msg = jsonify({'is_guess_correct': 'true'})
-                    else:
-                        msg = jsonify({'is_guess_correct': 'false'})
-
-                    response = make_response(msg, 200)
-
-    else: 
-        response = make_response(jsonify({'Error': 'Request missing `imageHash` or `guess`'}), 400)
-
+                    correct_park = np.lower().replace("_", " ").split("/")[-1]
+                    for guess in guesses:
+                        # check if guess is the same as np directory
+                        if guess.lower() == correct_park:
+                            msg = jsonify({'is_guess_correct': 'true', 'correct_park': correct_park})
+                        else:
+                            msg = jsonify({'is_guess_correct': 'false', 'correct_park': correct_park})
+            
+    if msg is None:
+        response = make_response(jsonify({'Error': 'Request error due to field `imageHash` or `guess`'}), 400)
+    else:
+        response = make_response(msg, 200)
+    response.mimetype = "application/javascript"
     return response
 

@@ -1,5 +1,6 @@
 import os.path
 import subprocess
+import time
 
 parks = [
     "Acadia National Park",
@@ -56,7 +57,7 @@ parks = [
     "Virgin Islands National Park",
     "Voyageurs National Park",
     "Wind Cave National Park",
-    "Wrangell – St. Elias National Park and Preserve",
+    "Wrangell - St. Elias National Park and Preserve",
     "Yellowstone National Park",
     "Yosemite National Park",
     "Zion National Park"
@@ -76,25 +77,25 @@ for park in parks:
 
     if file_count < 25: 
         files = 25 - file_count
+        print(dir_path)
 
         # run script to download images
         park_with_quotes = '"' + park + '"'
-        bash_command = ['googleimagesdownload', '--keywords', park_with_quotes,  '--limit', str(files)]
+        bash_command = ['googleimagesdownload', '--keywords', park_with_quotes,  '--limit', str(files), '--size', '>800*600']
         process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, cwd=dir_path)
         output, error = process.communicate()
         print(output)
-
+        
         # move pictures into parent dir
         park_with_backslashes = '\\"' + park + '\\"'
-        park_with_backslashes = park_with_backslashes.replace(" ", "\ ")
-        print(park_with_backslashes)
-        bash_command = ['mv', "./downloads/" + park_with_backslashes + "/*", "./"]
-        print(bash_command)
-        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, cwd=dir_path)
-        
-        # delete downloads folder
-        bash_command = ['rm', "-r" "./downloads"]
-        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, cwd=dir_path)
+        park_with_backslashes = park_with_backslashes.replace(" ", "\\ ")
+        process = subprocess.Popen("mv ./downloads/" + park_with_backslashes + "/* ./", cwd=dir_path, stdout=subprocess.PIPE, shell=True)
+        output, error = process.communicate()
+        print(output)
 
+        # delete downloads folder
+        bash_command = ['rm', "-r", "./downloads"]
+        process = subprocess.Popen(bash_command, stdout=subprocess.PIPE, cwd=dir_path)
+        output, error = process.communicate()
         print("Finished with " + park + "!")
 

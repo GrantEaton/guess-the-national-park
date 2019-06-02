@@ -7,7 +7,7 @@ parks = [
     "Arches National Park",
     "Badlands National Park",
     "Big Bend National Park",
-    "Biscayne National Park"
+    "Biscayne National Park",
     "Black Canyon of the Gunnison National Park",
     "Bryce Canyon National Park",
     "Canyonlands National Park",

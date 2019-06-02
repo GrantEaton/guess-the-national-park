@@ -13,25 +13,36 @@ app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}}, expose_headers='imageHash')
 app._static_folder = "./data"
 
-def get_random_photo_dir():
+reqs = {}
+
+def get_random_np_dir(seed):
+    random.seed(seed)
     np_dirs = [x[0] for x in os.walk("./data/")]
     np_dir = random.choice(np_dirs[1:])
+    print(np_dir)
     file_count = len([x[2] for x in os.walk(np_dir)])
     while (file_count < 3):
         np_dir = random.choice(np_dirs)
         file_count = len([x[2] for x in os.walk(np_dir)][0])
-        photo_dirs = [x[2] for x in os.walk(np_dir)]
-    filename = random.choice(photo_dirs[0])
 
-    return np_dir, filename
+    return np_dir
+
+def get_random_photo_dir(np_dir):
+    photo_dirs = [x[2] for x in os.walk(np_dir)]
+    return random.choice(photo_dirs[0])
+
 
 
 @app.route("/api/get-photo", methods=['GET'])
 def get_photo():
-    
-    np_dir, filename = get_random_photo_dir() 
+    seed = request.args.get('req')   
+
+    np_dir = get_random_np_dir(seed)
+    print(np_dir)
+    filename = get_random_photo_dir(np_dir) 
     response = send_from_directory(np_dir, filename)
     response.headers['imageHash'] = filename
+
     return response
 
 @app.route("/api/get-national-parks", methods=['GET'])

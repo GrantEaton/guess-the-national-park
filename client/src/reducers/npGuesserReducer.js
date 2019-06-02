@@ -37,6 +37,11 @@ export default function(state = INITIAL_STATE, action) {
         ...state,
         nationalParks: action.nationalParks
       };
+    case types.SAVE_DIFFICULTY:
+      return {
+        ...state,
+        difficulty: action.difficulty
+      };
     case types.SAVE_IMAGE_HASH:
       return {
         ...state,

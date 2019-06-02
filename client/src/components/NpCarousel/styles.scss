@@ -1,0 +1,33 @@
+$break-small: 320px;
+$break-med: 720px;
+$break-large: 1200px;
+
+.image_box {
+  float: center;
+  width: 90%;
+  height: auto;
+  padding-right: 5%;
+  padding-left: 5%;
+
+  @media screen and (min-width: $break-med) {
+    padding-right: 15%;
+    padding-left: 15%;
+  }
+  margin-left: auto;
+  margin-right: auto;
+}
+
+img {
+  display: block;
+  margin: auto;
+}
+
+.slide {
+  margin: auto 0;
+}
+
+.center {
+  margin: auto auto;
+  align-items: center;
+  max-height: 700px;
+}

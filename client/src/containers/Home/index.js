@@ -2,18 +2,20 @@ import React, { Component } from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
-import { Image } from "../../components";
+import { NpCarousel } from "../../components";
 import { NpGuesser } from "../";
 import * as actions from "../../actions/actions";
 
 class Home extends Component {
   componentWillMount() {
     this.props.actions.getNationalParks();
-    this.imageHash = this.props.actions.getPhoto();
+    this.props.actions.getPhoto("test");
+    this.props.actions.getPhoto("test");
+    this.imageHash = this.props.actions.getPhoto("test");
   }
 
   render() {
-    const { imageHash, selectedParks, actions } = this.props;
+    const { imageHash, nationalParks, selectedParks, actions } = this.props;
 
     return (
       /*
@@ -30,7 +32,7 @@ class Home extends Component {
       </div>
       */
       <div className="home mt-5">
-        <Image />
+        <NpCarousel />
         <NpGuesser
           sendGuesses={actions.sendGuesses}
           imageHash={imageHash}
@@ -44,7 +46,8 @@ class Home extends Component {
 const mapStateToProps = state => {
   return {
     selectedParks: state.npGuesser.selectedParks,
-    imageHash: state.npGuesser.imageHash
+    imageHash: state.npGuesser.imageHash,
+    nationalParks: state.npGuesser.nationalParks
   };
 };
 

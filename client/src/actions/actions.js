@@ -10,19 +10,31 @@ export const getNationalParks = state => dispatch => {
   );
 };
 
-export const getPhoto = state => dispatch =>
-  fetch(`${process.env.REACT_APP_API_URL}/api/get-photo`).then(response => {
-    response.arrayBuffer().then(buffer => {
-      var base64Flag = "data:image/jpeg;base64,";
-      var imageStr = arrayBufferToBase64(buffer);
-      if (response.headers.has("imageHash")) {
-        dispatch(saveImageHash(response.headers.get("imageHash")));
-      } else {
-        // error
-      }
-      document.querySelector("img").src = base64Flag + imageStr;
-    });
-  });
+export const getPhoto = req => dispatch =>
+  fetch(`${process.env.REACT_APP_API_URL}/api/get-photo?req=${req}`).then(
+    response => {
+      response.arrayBuffer().then(buffer => {
+        var base64Flag = "data:image/jpeg;base64,";
+        var imageStr = arrayBufferToBase64(buffer);
+        if (response.headers.has("imageHash")) {
+          dispatch(saveImageHash(response.headers.get("imageHash")));
+          dispatch(saveDifficulty("easy"));
+        } else {
+          // error
+        }
+
+        var selectedPhoto = false;
+        const images = document.querySelectorAll("img");
+        images.forEach((img, i) => {
+          if (img.src === "" && !selectedPhoto) {
+            img.src = base64Flag + imageStr;
+            images[i + images.length / 2].src = base64Flag + imageStr;
+            selectedPhoto = true;
+          }
+        });
+      });
+    }
+  );
 
 function arrayBufferToBase64(buffer) {
   var binary = "";
@@ -53,6 +65,11 @@ export const sendGuesses = (selectedParks, imageHash) => {
 export const compare = product => ({
   type: types.COMPARE_PRODUCT,
   product
+});
+
+export const saveDifficulty = difficulty => ({
+  type: types.SAVE_DIFFICULTY,
+  difficulty
 });
 
 export const saveNationalParks = nationalParks => ({
